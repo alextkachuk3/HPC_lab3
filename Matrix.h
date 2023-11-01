@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include "Vector.h"
 
 class Matrix
 {
@@ -10,6 +11,8 @@ public:
 	Matrix(const size_t& size);
 	Matrix(const size_t& width, const size_t& height);
 	~Matrix();
+
+	Vector serial_result_calculation(Vector vector);
 
 	void dummy_data_initialization();
 	void random_data_initialization();
@@ -22,6 +25,8 @@ public:
 
 	void set_submutrix_index(const size_t& submatrix_index);
 	void set_output_wide(const size_t& outputWide);
+
+	Matrix(const Matrix& matrix);
 
 	bool operator==(const Matrix& other);
 	friend Matrix operator*(const Matrix& left, const Matrix& right);

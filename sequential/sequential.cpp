@@ -10,14 +10,14 @@ bool evaluation_test = false;
 
 void test_matrix_vector_multiplication(const size_t& size)
 {
-	Matrix matrix_left(size);
-	Matrix matrix_right(size);
-	matrix_left.random_data_initialization();
-	matrix_right.random_data_initialization();
+	Matrix matrix(size);
+	Vector vector(size);
+	matrix.random_data_initialization();
+	vector.random_data_initialization();
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	Matrix result = matrix_left * matrix_right;
+	Vector result = matrix.serial_result_calculation(vector);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 
@@ -26,13 +26,11 @@ void test_matrix_vector_multiplication(const size_t& size)
 	if (print_values)
 	{
 		size_t outputWide = 10;
-		matrix_left.set_output_wide(outputWide);
-		matrix_right.set_output_wide(outputWide);
-		result.set_output_wide(outputWide);
+		matrix.set_output_wide(outputWide);
 
-		std::cout << "Left matrix" << std::endl << matrix_left;
-		std::cout << "Right matrix" << std::endl << matrix_right;
-		std::cout << "Result vector:" << std::endl << result;
+		std::cout << "Matrix" << std::endl << matrix;
+		std::cout << "Vector" << std::endl << vector;
+		std::cout << "Result:" << std::endl << result;
 	}
 
 	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl;

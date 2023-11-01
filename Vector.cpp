@@ -4,21 +4,16 @@ Vector::Vector(const size_t& size)
 {
 	this->size = size;
 	values = new double[size] {0};
-	delete_on_release = true;
-}
-
-Vector::Vector(double* values, const size_t& size, const bool& delete_on_release)
-{
-	this->delete_on_release = delete_on_release;
-	this->size = size;
-	this->values = values;
+	this->delete_counter = new int{ 1 };
 }
 
 Vector::~Vector()
 {
-	if (delete_on_release)
+	delete_counter--;
+	if (delete_counter == 0)
 	{
 		delete[] values;
+		delete delete_counter;
 	}
 }
 
@@ -30,6 +25,14 @@ std::string Vector::to_string() const
 		string << std::fixed << std::setprecision(4) << values[i] << std::endl;
 	}
 	return string.str();
+}
+
+Vector::Vector(const Vector& vector)
+{
+	delete_counter = vector.delete_counter;
+	delete_counter++;
+	values = vector.values;
+	size = vector.size;
 }
 
 void Vector::dummy_data_initialization()

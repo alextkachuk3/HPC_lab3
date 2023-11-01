@@ -34,6 +34,12 @@ Matrix::~Matrix()
 	}
 }
 
+Vector Matrix::serial_result_calculation(Vector vector)
+{
+	Vector result(vector.get_size());
+	return result;
+}
+
 std::string Matrix::to_string() const
 {
 	std::stringstream string;
@@ -76,6 +82,17 @@ void Matrix::set_submutrix_index(const size_t& submatrix_index)
 void Matrix::set_output_wide(const size_t& outputWide)
 {
 	this->outputWide = outputWide;
+}
+
+Matrix::Matrix(const Matrix& matrix)
+{
+	delete_counter = matrix.delete_counter;
+	delete_counter++;
+	values = matrix.values;
+	width = matrix.width;
+	height = matrix.height;
+	submatrix_index = matrix.submatrix_index;
+	outputWide = matrix.outputWide;
 }
 
 bool Matrix::operator==(const Matrix& other)
