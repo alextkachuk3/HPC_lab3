@@ -34,9 +34,21 @@ Matrix::~Matrix()
 	}
 }
 
-Vector Matrix::serial_result_calculation(Vector vector)
+Vector Matrix::serial_result_calculation(const Vector& vector)
 {
 	Vector result(vector.get_size());
+	serial_pivot_pos = new size_t[height];
+	serial_pivot_iter = new size_t[height];
+	for (int i = 0; i < height; i++)
+	{
+		serial_pivot_iter[i] = -1;
+	}
+
+	serial_gaussian_elimination(*this, vector, height);
+	serial_back_substitution(*this, vector, result, height);
+
+	delete[] serial_pivot_pos;
+	delete[] serial_pivot_iter;
 	return result;
 }
 
@@ -97,7 +109,7 @@ Matrix::Matrix(const Matrix& matrix)
 
 bool Matrix::operator==(const Matrix& other)
 {
-	static double Accuracy = 1.e-6;
+	const static double accuracy = 1.e-6;
 
 	if (this->width != other.width && this->height != other.height)
 	{
@@ -108,7 +120,7 @@ bool Matrix::operator==(const Matrix& other)
 	{
 		for (size_t j = 0; j < width; j++)
 		{
-			if (fabs(other.values[i * width + j] - values[i * width + j] >= Accuracy))
+			if (fabs(other.values[i * width + j] - values[i * width + j] >= accuracy))
 			{
 				return false;
 			}
@@ -116,6 +128,11 @@ bool Matrix::operator==(const Matrix& other)
 	}
 
 	return true;
+}
+
+double* Matrix::operator[](const size_t& index) const
+{
+	return &values[index];
 }
 
 Matrix& Matrix::operator+=(const Matrix& other)
@@ -130,13 +147,83 @@ Matrix& Matrix::operator+=(const Matrix& other)
 	return *this;
 }
 
+size_t Matrix::find_pivot_row(const Matrix& matrix, const size_t& size, const size_t& iter)
+{
+	size_t pivot_row = -1;
+	int max_value = 0;
+
+	for (size_t i = 0; i < size; i++) 
+	{
+		if ((serial_pivot_iter[i] == -1) &&	(fabs(*matrix[i * size + iter]) > max_value)) 
+		{
+			pivot_row = i;
+			max_value = (int)fabs(*matrix[i * size + iter]);
+		}
+	}
+	return pivot_row;
+}
+
+void Matrix::serial_column_elimination(const Matrix& matrix, const Vector& vector, const size_t& pivot, const size_t& iter, const size_t& size)
+{
+	double pivot_value, pivot_factor;
+	pivot_value = *matrix[pivot * size + iter];
+	for (size_t i = 0; i < size; i++) 
+	{
+		if (serial_pivot_iter[i] == -1) 
+		{
+			pivot_factor = *matrix[i * size + iter] / pivot_value;
+			for (size_t j = iter; j < size; j++) {
+				*matrix[i * size + j] -= pivot_factor * *matrix[pivot * size + j];
+			}
+			*vector[i] -= pivot_factor * *vector[pivot];
+		}
+	}
+}
+
+void Matrix::serial_gaussian_elimination(const Matrix& matrix, const Vector& vector, const size_t& size)
+{
+	size_t pivot_row;
+	for (size_t iter = 0; iter < size; iter++)
+	{
+		pivot_row = find_pivot_row(matrix, size, iter);
+		serial_pivot_pos[iter] = pivot_row;
+		serial_pivot_iter[pivot_row] = iter;
+		serial_column_elimination(matrix, vector, pivot_row, iter, size);
+	}
+}
+
+void Matrix::serial_back_substitution(const Matrix& matrix, const Vector& vector, Vector& result, const size_t& size)
+{
+	size_t row_index, row;
+	for (int i = (int)size - 1; i >= 0; i--) 
+	{
+		row_index = serial_pivot_pos[i];
+		*result[i] = *vector[row_index] / *matrix[size * row_index + i];
+		for (size_t j = 0; j < i; j++) {
+			row = serial_pivot_pos[j];
+			*vector[j] -= *matrix[row * size + i] * *result[i];
+			*matrix[row * size + i] = 0;
+		}
+	}
+}
+
+
+
 void Matrix::dummy_data_initialization()
 {
 	for (size_t i = 0; i < height; i++)
 	{
 		for (size_t j = 0; j < width; j++)
 		{
-			values[i * width + j] = 1.0;
+			if (j <= i)
+			{
+				values[i * width + j] = 1.0;
+			}
+			else
+			{
+				values[i * width + j] = 0.0;
+			}
+
 		}
 	}
 }

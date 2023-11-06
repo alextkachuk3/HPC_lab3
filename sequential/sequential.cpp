@@ -5,7 +5,7 @@
 #include "../Matrix.h"
 #include "../Vector.h"
 
-bool print_values = false;
+bool print_values = true;
 bool evaluation_test = false;
 
 void test_matrix_vector_multiplication(const size_t& size)
@@ -14,6 +14,15 @@ void test_matrix_vector_multiplication(const size_t& size)
 	Vector vector(size);
 	matrix.random_data_initialization();
 	vector.random_data_initialization();
+
+	if (print_values)
+	{
+		size_t outputWide = 10;
+		matrix.set_output_wide(outputWide);
+
+		std::cout << "Matrix" << std::endl << matrix;
+		std::cout << "Vector" << std::endl << vector;
+	}
 
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -28,10 +37,8 @@ void test_matrix_vector_multiplication(const size_t& size)
 		size_t outputWide = 10;
 		matrix.set_output_wide(outputWide);
 
-		std::cout << "Matrix" << std::endl << matrix;
-		std::cout << "Vector" << std::endl << vector;
 		std::cout << "Result:" << std::endl << result;
-	}
+	}	
 
 	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl;
 }
