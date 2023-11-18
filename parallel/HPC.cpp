@@ -10,19 +10,23 @@ HPC::HPC(int argc, char* argv[])
 	height = 0;
 	width = 0;
 	distibution_size = 0;
+	distribution_rows_size = 0;
 	process_rows = 0;
 
 	distribution_rows = new int[process_num];
+	distribution_rows_index = new int[process_num];
 	distribution_count = new int[process_num];
 	distribution_index = new int[process_num];
 
 	process_result = nullptr;
+	result = nullptr;
 }
 
 HPC::~HPC()
 {
 	MPI_Finalize();
 	delete[] distribution_rows;
+	delete[] distribution_rows_index;
 	delete[] distribution_count;
 	delete[] distribution_index;
 }
@@ -39,8 +43,6 @@ int HPC::get_process_num()
 
 Vector HPC::solve_linear_equation_system(Matrix& matrix)
 {
-	Vector result(matrix.get_height());
-
 	height = (int)matrix.get_height();
 	width = (int)matrix.get_width();
 
@@ -52,11 +54,14 @@ Vector HPC::solve_linear_equation_system(Matrix& matrix)
 	process_rows = new double[distribution_count[process_rank]];
 	process_result = new double[distribution_count[process_rank] / width];
 
+	result = new double[distribution_count[process_rank] / width];
+
 	distribute_matrix(matrix.get_values());
 
 	delete[] process_rows;
+	delete[] process_result;
 
-	return result;
+	return Vector(result, (size_t)height);
 }
 
 void HPC::solve_linear_equation_system()
@@ -82,13 +87,14 @@ void HPC::solve_linear_equation_system()
 		}
 	}*/
 
-	std::string val;
+	/*std::string val;
 
 	for (int i = 0; i < distribution_count[process_rank]; i++)
 	{
 		val += (std::to_string(process_rows[i]) + ", ");
 	}
-	log(val);
+	log(val);*/
+
 
 	delete[] process_rows;
 }
@@ -105,17 +111,25 @@ void HPC::distribute_matrix(double* matrix)
 
 void HPC::calculate_distribution()
 {
-	distibution_size = (height / process_num) * width;
+	distribution_rows_size = height / process_num;
+	distibution_size = distribution_rows_size * width;
 
-	std::fill_n(distribution_rows, process_num, height / process_num);
+	std::fill_n(distribution_rows, process_num, distribution_rows_size);
 	std::fill_n(distribution_count, process_num, distibution_size);
 
 	distribution_rows[process_num - 1] += (height % process_num);
 	distribution_count[process_num - 1] += (height % process_num) * width;
 
 	distribution_index[0] = 0;
+	distribution_rows_index[0] = 0;
 	for (size_t i = 1; i < process_num; i++)
 	{
 		distribution_index[i] = distribution_index[i - 1] + distibution_size;
+		distribution_rows_index[i] = distribution_rows_index[i - 1] + distribution_rows_size;
 	}
+}
+
+void HPC::result_colection()
+{
+	MPI_Gatherv(process_result, distribution_rows[process_rank], MPI_DOUBLE, result, distribution_rows, distribution_rows_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 }

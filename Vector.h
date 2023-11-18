@@ -7,6 +7,7 @@ class Vector
 {
 public:
 	Vector(const size_t& size);
+	Vector(const double* values, const size_t& size);
 	~Vector();
 
 	void dummy_data_initialization();
@@ -26,6 +27,4 @@ public:
 private:
 	size_t size;
 	double* values;
-
-	int* delete_counter;
 };

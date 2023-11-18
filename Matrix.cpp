@@ -68,19 +68,9 @@ size_t Matrix::get_height() const
 	return height;
 }
 
-size_t Matrix::get_submatrix_index() const
-{
-	return submatrix_index;
-}
-
 double*& Matrix::get_values()
 {
 	return values;
-}
-
-void Matrix::set_submutrix_index(const size_t& submatrix_index)
-{
-	this->submatrix_index = submatrix_index;
 }
 
 void Matrix::set_output_wide(const size_t& outputWide)
@@ -91,10 +81,9 @@ void Matrix::set_output_wide(const size_t& outputWide)
 Matrix::Matrix(const Matrix& matrix)
 {
 	values = new double[matrix.width * matrix.height];
-	memcpy_s(values, matrix.width * matrix.height * sizeof(double), matrix.values, matrix.width * matrix.height * sizeof(double));
 	width = matrix.width;
 	height = matrix.height;
-	submatrix_index = matrix.submatrix_index;
+	memcpy_s(values, width * height * sizeof(double), matrix.values, matrix.width * matrix.height * sizeof(double));
 	outputWide = matrix.outputWide;
 }
 

@@ -3,18 +3,19 @@
 Vector::Vector(const size_t& size)
 {
 	this->size = size;
-	values = new double[size] {0};
-	this->delete_counter = new int{ 1 };
+	values = new double[size] {};
+}
+
+Vector::Vector(const double* values, const size_t& size)
+{
+	this->values = new double[size];
+	this->size = size;
+	memcpy_s(this->values, this->size * sizeof(double), values, size * sizeof(double));
 }
 
 Vector::~Vector()
 {
-	delete_counter--;
-	if (delete_counter == 0)
-	{
-		delete[] values;
-		delete delete_counter;
-	}
+	delete[] values;
 }
 
 std::string Vector::to_string() const
@@ -29,10 +30,9 @@ std::string Vector::to_string() const
 
 Vector::Vector(const Vector& vector)
 {
-	delete_counter = vector.delete_counter;
-	delete_counter++;
-	values = vector.values;
+	values = new double[vector.size];
 	size = vector.size;
+	memcpy_s(values, size * sizeof(double), vector.values, vector.size * sizeof(double));
 }
 
 void Vector::dummy_data_initialization()

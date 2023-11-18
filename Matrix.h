@@ -22,10 +22,8 @@ public:
 	std::string to_string() const;
 	size_t get_width() const;
 	size_t get_height() const;
-	size_t get_submatrix_index() const;
 	double*& get_values();
 
-	void set_submutrix_index(const size_t& submatrix_index);
 	void set_output_wide(const size_t& outputWide);
 
 	Matrix(const Matrix& matrix);

@@ -21,16 +21,22 @@ private:
 	int height;
 	int width;
 
+	int distribution_rows_size;
 	int distibution_size;
 	int* distribution_rows;
+	int* distribution_rows_index;
 	int* distribution_count;
 	int* distribution_index;
 
 	double* process_rows;
 	double* process_result;
 
+	double* result;
+
 	void calculate_distribution();
 	void distribute_matrix(double* matrix = nullptr);
+
+	void result_colection();
 
 	void log(std::string message);
 };
