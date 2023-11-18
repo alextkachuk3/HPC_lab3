@@ -22,10 +22,12 @@ private:
 	int width;
 
 	int distibution_size;
+	int* distribution_rows;
 	int* distribution_count;
 	int* distribution_index;
 
 	double* process_rows;
+	double* process_result;
 
 	void calculate_distribution();
 	void distribute_matrix(double* matrix = nullptr);

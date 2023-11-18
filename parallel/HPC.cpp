@@ -12,14 +12,17 @@ HPC::HPC(int argc, char* argv[])
 	distibution_size = 0;
 	process_rows = 0;
 
-
+	distribution_rows = new int[process_num];
 	distribution_count = new int[process_num];
 	distribution_index = new int[process_num];
+
+	process_result = nullptr;
 }
 
 HPC::~HPC()
 {
 	MPI_Finalize();
+	delete[] distribution_rows;
 	delete[] distribution_count;
 	delete[] distribution_index;
 }
@@ -46,7 +49,8 @@ Vector HPC::solve_linear_equation_system(Matrix& matrix)
 
 	calculate_distribution();
 
-	process_rows = new double[distribution_count[process_rank] * width];
+	process_rows = new double[distribution_count[process_rank]];
+	process_result = new double[distribution_count[process_rank] / width];
 
 	distribute_matrix(matrix.get_values());
 
@@ -62,11 +66,12 @@ void HPC::solve_linear_equation_system()
 
 	calculate_distribution();
 
-	process_rows = new double[distribution_count[process_rank] * width];
+	process_rows = new double[distribution_count[process_rank]];
+	process_result = new double[distribution_count[process_rank] / width];
 
 	distribute_matrix();
 
-	if (process_rank == 0)
+	/*if (process_rank == 0)
 	{
 		log("distribution_size:" + std::to_string(distibution_size));
 
@@ -75,7 +80,7 @@ void HPC::solve_linear_equation_system()
 			log("i: " + std::to_string(i) + " " + "dist size: " + std::to_string(distribution_count[i]));
 			log("i: " + std::to_string(i) + " " + "dist index: " + std::to_string(distribution_index[i]));
 		}
-	}
+	}*/
 
 	std::string val;
 
@@ -84,7 +89,7 @@ void HPC::solve_linear_equation_system()
 		val += (std::to_string(process_rows[i]) + ", ");
 	}
 	log(val);
-	
+
 	delete[] process_rows;
 }
 
@@ -102,8 +107,10 @@ void HPC::calculate_distribution()
 {
 	distibution_size = (height / process_num) * width;
 
+	std::fill_n(distribution_rows, process_num, height / process_num);
 	std::fill_n(distribution_count, process_num, distibution_size);
 
+	distribution_rows[process_num - 1] += (height % process_num);
 	distribution_count[process_num - 1] += (height % process_num) * width;
 
 	distribution_index[0] = 0;
