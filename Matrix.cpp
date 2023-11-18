@@ -38,20 +38,11 @@ Vector Matrix::serial_result_calculation()
 {
 	Vector result(height);
 
-
 	serial_gaussian_elimination();
-	
-	std::cout << "Matrix elim:" << std::endl << *this;
 	serial_back_substitution();
-	std::cout << "Matrix back:" << std::endl << *this;
+
 	for (size_t i = 0; i < height; i++)
 	{
-		/*double q = values[(i + 1) * width - 1];
-		double w = values[i * (width + 1)];
-
-		std::cout << "i " << i << "; q " << q << "; w " << w << std::endl;*/
-
-		//result[i] = values[(i+1) * width] / values[i * (width - 1)];
 		result[i] = values[(i + 1) * width - 1] / values[i * (width + 1)];
 	}
 
@@ -161,7 +152,6 @@ void Matrix::serial_gaussian_elimination()
 		for (size_t j = i + 1; j < height; j++)
 		{
 			mult = values[j * width + i] / values[i * width + i];
-			// std::cout << "i " << i << "; " << "j " << j << ": " << mult << std::endl;
 			for (size_t k = i; k < width; k++)
 			{
 				values[j * width + k] -= (values[i * width + k] * mult);
@@ -177,13 +167,7 @@ void Matrix::serial_back_substitution()
 	{
 		for (size_t j = i; j >= 1; j--)
 		{
-			/*double w = values[(j - 1) * width + i];
-			double q = values[i * (width + 1)];
-			mult = w / q;
-			std::cout << "i " << i << "; " << "j " << j << "; w " << w << "; q " << q << ": " << mult << std::endl;*/
 			mult = values[(j - 1) * width + i] / values[i * (width + 1)];
-			
-			std::cout << "i " << i << "; " << "j " << j << ": " << mult << std::endl;
 			for (size_t k = width - 1; k >= j ; k--)
 			{
 				values[(j - 1) * width + k] -= (values[i * width + k] * mult);

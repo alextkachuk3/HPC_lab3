@@ -5,7 +5,7 @@
 #include "../Matrix.h"
 #include "../Vector.h"
 
-bool print_values = true;
+bool print_values = false;
 bool evaluation_test = false;
 
 void test_matrix_vector_multiplication(const size_t& size)
@@ -37,12 +37,13 @@ void test_matrix_vector_multiplication(const size_t& size)
 		std::cout << "Result:" << std::endl << result;
 	}	
 
-	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl;
+	std::cout << "Matrix size: " << size << std::endl;
+	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl << std::endl;
 }
 
 int main(int argc, char* argv[])
 {
-	//srand(clock());
+	srand(clock());
 
 	for (size_t i = 0; i < argc; i++)
 	{
