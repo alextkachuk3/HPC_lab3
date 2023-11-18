@@ -17,5 +17,9 @@ public:
 private:
 	int process_num;
 	int process_rank;
+
+	size_t size;
+
+	void log(std::string message);
 };
 
