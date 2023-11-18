@@ -23,7 +23,7 @@ void test_matrix_vector_multiplication(const size_t& size)
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	Vector result = matrix.serial_result_calculation();
+	Vector result = matrix.solve_linear_equation_system();
 
 	auto finish = std::chrono::high_resolution_clock::now();
 
@@ -35,7 +35,7 @@ void test_matrix_vector_multiplication(const size_t& size)
 		matrix.set_output_wide(outputWide);
 
 		std::cout << "Result:" << std::endl << result;
-	}	
+	}
 
 	std::cout << "Matrix size: " << size << std::endl;
 	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl << std::endl;

@@ -12,7 +12,7 @@ public:
 	Matrix(const size_t& width, const size_t& height);
 	~Matrix();
 
-	Vector serial_result_calculation();
+	Vector solve_linear_equation_system();
 
 	void dummy_data_initialization();
 	void random_data_initialization();
@@ -46,6 +46,6 @@ private:
 	size_t outputWide;
 	const static size_t defaultOutputWide = 16;
 
-	void serial_gaussian_elimination();
-	void serial_back_substitution();
+	void gaussian_elimination();
+	void back_substitution();
 };

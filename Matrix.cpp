@@ -34,12 +34,12 @@ Matrix::~Matrix()
 	}
 }
 
-Vector Matrix::serial_result_calculation()
+Vector Matrix::solve_linear_equation_system()
 {
 	Vector result(height);
 
-	serial_gaussian_elimination();
-	serial_back_substitution();
+	gaussian_elimination();
+	back_substitution();
 
 	for (size_t i = 0; i < height; i++)
 	{
@@ -144,7 +144,7 @@ Matrix& Matrix::operator+=(const Matrix& other)
 	return *this;
 }
 
-void Matrix::serial_gaussian_elimination()
+void Matrix::gaussian_elimination()
 {
 	double mult;
 	for (size_t i = 0; i < height - 1; i++)
@@ -160,15 +160,15 @@ void Matrix::serial_gaussian_elimination()
 	}
 }
 
-void Matrix::serial_back_substitution()
+void Matrix::back_substitution()
 {
 	double mult;
-	for (size_t i = height - 1; i >= 1 ; i--)
+	for (size_t i = height - 1; i >= 1; i--)
 	{
 		for (size_t j = i; j >= 1; j--)
 		{
 			mult = values[(j - 1) * width + i] / values[i * (width + 1)];
-			for (size_t k = width - 1; k >= j ; k--)
+			for (size_t k = width - 1; k >= j; k--)
 			{
 				values[(j - 1) * width + k] -= (values[i * width + k] * mult);
 			}
