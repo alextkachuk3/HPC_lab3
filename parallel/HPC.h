@@ -18,7 +18,17 @@ private:
 	int process_num;
 	int process_rank;
 
-	size_t size;
+	int height;
+	int width;
+
+	int distibution_size;
+	int* distribution_count;
+	int* distribution_index;
+
+	double* process_rows;
+
+	void calculate_distribution();
+	void distribute_matrix(double* matrix = nullptr);
 
 	void log(std::string message);
 };

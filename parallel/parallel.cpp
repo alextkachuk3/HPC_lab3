@@ -10,7 +10,7 @@ void test_matrix_multiplication(const size_t& size, HPC& hpc)
 
 	matrix.random_data_initialization();
 
-	if (print_values)
+	if (true)
 	{
 		size_t outputWide = 10;
 		matrix.set_output_wide(outputWide);
