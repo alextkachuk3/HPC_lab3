@@ -10,23 +10,20 @@ bool evaluation_test = false;
 
 void test_matrix_vector_multiplication(const size_t& size)
 {
-	Matrix matrix(size);
-	Vector vector(size);
+	Matrix matrix(size + 1, size);
 	matrix.random_data_initialization();
-	vector.random_data_initialization();
 
 	if (print_values)
 	{
-		size_t outputWide = 10;
+		size_t outputWide = 16;
 		matrix.set_output_wide(outputWide);
 
 		std::cout << "Matrix" << std::endl << matrix;
-		std::cout << "Vector" << std::endl << vector;
 	}
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	Vector result = matrix.serial_result_calculation(vector);
+	Vector result = matrix.serial_result_calculation();
 
 	auto finish = std::chrono::high_resolution_clock::now();
 
@@ -45,7 +42,7 @@ void test_matrix_vector_multiplication(const size_t& size)
 
 int main(int argc, char* argv[])
 {
-	srand(clock());
+	//srand(clock());
 
 	for (size_t i = 0; i < argc; i++)
 	{
@@ -65,14 +62,6 @@ int main(int argc, char* argv[])
 
 		for (size_t i = 0; i < sizeof(evaluation_sizes) / sizeof(size_t); i++)
 		{
-			Matrix matrix_left(evaluation_sizes[i]);
-			Matrix matrix_right(evaluation_sizes[i]);
-			matrix_left.random_data_initialization();
-			matrix_right.random_data_initialization();
-
-			std::cout << std::endl << "Matrix size " << evaluation_sizes[i] << "x"
-				<< evaluation_sizes[i] << ":" << std::endl;
-
 			test_matrix_vector_multiplication(evaluation_sizes[i]);
 		}
 		return 0;

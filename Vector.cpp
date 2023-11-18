@@ -87,7 +87,7 @@ bool Vector::operator==(const Vector& other)
 	return true;
 }
 
-double* Vector::operator[](const size_t& index) const
+double& Vector::operator[](const size_t& index) const
 {
-	return &values[index];
+	return values[index];
 }

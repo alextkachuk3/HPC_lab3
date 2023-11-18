@@ -34,21 +34,27 @@ Matrix::~Matrix()
 	}
 }
 
-Vector Matrix::serial_result_calculation(const Vector& vector)
+Vector Matrix::serial_result_calculation()
 {
-	Vector result(vector.get_size());
-	serial_pivot_pos = new size_t[height];
-	serial_pivot_iter = new size_t[height];
-	for (int i = 0; i < height; i++)
+	Vector result(height);
+
+
+	serial_gaussian_elimination();
+	
+	std::cout << "Matrix elim:" << std::endl << *this;
+	serial_back_substitution();
+	std::cout << "Matrix back:" << std::endl << *this;
+	for (size_t i = 0; i < height; i++)
 	{
-		serial_pivot_iter[i] = -1;
+		/*double q = values[(i + 1) * width - 1];
+		double w = values[i * (width + 1)];
+
+		std::cout << "i " << i << "; q " << q << "; w " << w << std::endl;*/
+
+		//result[i] = values[(i+1) * width] / values[i * (width - 1)];
+		result[i] = values[(i + 1) * width - 1] / values[i * (width + 1)];
 	}
 
-	serial_gaussian_elimination(*this, vector, height);
-	serial_back_substitution(*this, vector, result, height);
-
-	delete[] serial_pivot_pos;
-	delete[] serial_pivot_iter;
 	return result;
 }
 
@@ -59,7 +65,7 @@ std::string Matrix::to_string() const
 	{
 		for (size_t j = 0; j < width; j++)
 		{
-			string << std::setw(outputWide) << std::fixed << std::setprecision(3) << values[i * width + j];
+			string << std::setw(outputWide) << std::fixed << std::setprecision(5) << values[i * width + j];
 		}
 		string << std::setw(0) << std::endl;
 	}
@@ -130,9 +136,9 @@ bool Matrix::operator==(const Matrix& other)
 	return true;
 }
 
-double* Matrix::operator[](const size_t& index) const
+double& Matrix::operator[](const size_t& index) const
 {
-	return &values[index];
+	return values[index];
 }
 
 Matrix& Matrix::operator+=(const Matrix& other)
@@ -147,67 +153,44 @@ Matrix& Matrix::operator+=(const Matrix& other)
 	return *this;
 }
 
-size_t Matrix::find_pivot_row(const Matrix& matrix, const size_t& size, const size_t& iter)
+void Matrix::serial_gaussian_elimination()
 {
-	size_t pivot_row = -1;
-	int max_value = 0;
-
-	for (size_t i = 0; i < size; i++) 
+	double mult;
+	for (size_t i = 0; i < height - 1; i++)
 	{
-		if ((serial_pivot_iter[i] == -1) &&	(fabs(*matrix[i * size + iter]) > max_value)) 
+		for (size_t j = i + 1; j < height; j++)
 		{
-			pivot_row = i;
-			max_value = (int)fabs(*matrix[i * size + iter]);
-		}
-	}
-	return pivot_row;
-}
-
-void Matrix::serial_column_elimination(const Matrix& matrix, const Vector& vector, const size_t& pivot, const size_t& iter, const size_t& size)
-{
-	double pivot_value, pivot_factor;
-	pivot_value = *matrix[pivot * size + iter];
-	for (size_t i = 0; i < size; i++) 
-	{
-		if (serial_pivot_iter[i] == -1) 
-		{
-			pivot_factor = *matrix[i * size + iter] / pivot_value;
-			for (size_t j = iter; j < size; j++) {
-				*matrix[i * size + j] -= pivot_factor * *matrix[pivot * size + j];
+			mult = values[j * width + i] / values[i * width + i];
+			// std::cout << "i " << i << "; " << "j " << j << ": " << mult << std::endl;
+			for (size_t k = i; k < width; k++)
+			{
+				values[j * width + k] -= (values[i * width + k] * mult);
 			}
-			*vector[i] -= pivot_factor * *vector[pivot];
 		}
 	}
 }
 
-void Matrix::serial_gaussian_elimination(const Matrix& matrix, const Vector& vector, const size_t& size)
+void Matrix::serial_back_substitution()
 {
-	size_t pivot_row;
-	for (size_t iter = 0; iter < size; iter++)
+	double mult;
+	for (size_t i = height - 1; i >= 1 ; i--)
 	{
-		pivot_row = find_pivot_row(matrix, size, iter);
-		serial_pivot_pos[iter] = pivot_row;
-		serial_pivot_iter[pivot_row] = iter;
-		serial_column_elimination(matrix, vector, pivot_row, iter, size);
-	}
-}
-
-void Matrix::serial_back_substitution(const Matrix& matrix, const Vector& vector, Vector& result, const size_t& size)
-{
-	size_t row_index, row;
-	for (int i = (int)size - 1; i >= 0; i--) 
-	{
-		row_index = serial_pivot_pos[i];
-		*result[i] = *vector[row_index] / *matrix[size * row_index + i];
-		for (size_t j = 0; j < i; j++) {
-			row = serial_pivot_pos[j];
-			*vector[j] -= *matrix[row * size + i] * *result[i];
-			*matrix[row * size + i] = 0;
+		for (size_t j = i; j >= 1; j--)
+		{
+			/*double w = values[(j - 1) * width + i];
+			double q = values[i * (width + 1)];
+			mult = w / q;
+			std::cout << "i " << i << "; " << "j " << j << "; w " << w << "; q " << q << ": " << mult << std::endl;*/
+			mult = values[(j - 1) * width + i] / values[i * (width + 1)];
+			
+			std::cout << "i " << i << "; " << "j " << j << ": " << mult << std::endl;
+			for (size_t k = width - 1; k >= j ; k--)
+			{
+				values[(j - 1) * width + k] -= (values[i * width + k] * mult);
+			}
 		}
 	}
 }
-
-
 
 void Matrix::dummy_data_initialization()
 {

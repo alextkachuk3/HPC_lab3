@@ -19,7 +19,7 @@ public:
 	Vector(const Vector& vector);
 
 	bool operator==(const Vector& other);
-	double* operator[](const size_t& index) const;
+	double& operator[](const size_t& index) const;
 
 	friend std::ostream& operator<< (std::ostream& out, const Vector& vector);
 
