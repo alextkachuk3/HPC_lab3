@@ -13,6 +13,8 @@ public:
 	~Matrix();
 
 	Vector solve_linear_equation_system();
+	void gaussian_elimination();
+	void back_substitution();
 
 	void dummy_data_initialization();
 	void random_data_initialization();
@@ -41,11 +43,6 @@ private:
 	size_t submatrix_index;
 	double* values;
 
-	int* delete_counter;
-
 	size_t outputWide;
-	const static size_t defaultOutputWide = 16;
-
-	void gaussian_elimination();
-	void back_substitution();
+	const static size_t defaultOutputWide = 8;
 };

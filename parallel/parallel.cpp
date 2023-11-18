@@ -8,6 +8,16 @@ void test_matrix_multiplication(const size_t& size, HPC& hpc)
 {
 	Matrix matrix(size + 1, size);
 
+	matrix.random_data_initialization();
+
+	if (print_values)
+	{
+		size_t outputWide = 10;
+		matrix.set_output_wide(outputWide);
+
+		std::cout << "Equation system:" << std::endl << matrix << std::endl;
+	}
+
 	double start, finish, duration;
 
 	start = MPI_Wtime();
@@ -19,28 +29,25 @@ void test_matrix_multiplication(const size_t& size, HPC& hpc)
 
 	if (print_values)
 	{
-		size_t outputWide = 10;
-		matrix.set_output_wide(outputWide);
-
-		std::cout << "Result:" << std::endl << result;
+		std::cout << "Result:" << std::endl << result << std::endl << result;
 	}
 
-	std::cout << "Matrix size: " << size << std::endl;
-	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl << std::endl;
+	// std::cout << "Matrix size: " << size << std::endl;
+	// std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl << std::endl;
 
-	if (result == matrix.solve_linear_equation_system())
-	{
-		std::cout << "The results of serial and parallel algorithms are identical!" << std::endl;
-	}
-	else
-	{
-		std::cout << "The results of serial and parallel algorithms are NOT identical!" << std::endl;
-	}
+	//if (result == matrix.solve_linear_equation_system())
+	//{
+	//	std::cout << "The results of serial and parallel algorithms are identical!" << std::endl;
+	//}
+	//else
+	//{
+	//	std::cout << "The results of serial and parallel algorithms are NOT identical!" << std::endl;
+	//}
 }
 
 int main(int argc, char* argv[])
 {
-	srand(clock());
+	//srand(clock());
 
 	for (size_t i = 0; i < argc; i++)
 	{
@@ -56,7 +63,7 @@ int main(int argc, char* argv[])
 
 	HPC hpc(argc, argv);
 
-	size_t* evaluation_sizes = new size_t[9]{ 10, 100, 500, 1000, 1500, 2000, 2500, 3000 };
+	size_t evaluation_sizes[] = { 10, 100, 500, 1000, 1500, 2000, 2500, 3000 };
 
 	if (hpc.get_process_rank() == 0)
 	{
@@ -78,7 +85,6 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			delete[] evaluation_sizes;
 			return 0;
 		}
 
@@ -102,6 +108,5 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	delete[] evaluation_sizes;
 	return 0;
 }

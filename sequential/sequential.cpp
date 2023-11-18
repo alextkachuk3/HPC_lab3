@@ -15,7 +15,7 @@ void test_matrix_vector_multiplication(const size_t& size)
 
 	if (print_values)
 	{
-		size_t outputWide = 16;
+		size_t outputWide = 10;
 		matrix.set_output_wide(outputWide);
 
 		std::cout << "Matrix" << std::endl << matrix;

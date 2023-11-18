@@ -11,7 +11,7 @@ public:
 	int get_process_rank();
 	int get_process_num();
 
-	Vector solve_linear_equation_system(const Matrix& matrix);
+	Vector solve_linear_equation_system(Matrix& matrix);
 	void solve_linear_equation_system();
 
 private:

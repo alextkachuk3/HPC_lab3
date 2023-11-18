@@ -9,7 +9,6 @@ Matrix::Matrix(const size_t& size)
 	this->height = size;
 
 	values = new double[size * size] {0};
-	this->delete_counter = new int{ 1 };
 }
 
 Matrix::Matrix(const size_t& width, const size_t& height)
@@ -21,29 +20,25 @@ Matrix::Matrix(const size_t& width, const size_t& height)
 	this->height = height;
 
 	values = new double[width * height] {0};
-	this->delete_counter = new int{ 1 };
 }
 
 Matrix::~Matrix()
 {
-	delete_counter--;
-	if (delete_counter == 0)
-	{
-		delete[] values;
-		delete delete_counter;
-	}
+	delete[] values;
 }
 
 Vector Matrix::solve_linear_equation_system()
 {
 	Vector result(height);
 
-	gaussian_elimination();
-	back_substitution();
+	Matrix copy_matrix(*this);
+
+	copy_matrix.gaussian_elimination();
+	copy_matrix.back_substitution();
 
 	for (size_t i = 0; i < height; i++)
 	{
-		result[i] = values[(i + 1) * width - 1] / values[i * (width + 1)];
+		result[i] = copy_matrix.values[(i + 1) * copy_matrix.width - 1] / copy_matrix.values[i * (copy_matrix.width + 1)];
 	}
 
 	return result;
@@ -56,7 +51,7 @@ std::string Matrix::to_string() const
 	{
 		for (size_t j = 0; j < width; j++)
 		{
-			string << std::setw(outputWide) << std::fixed << std::setprecision(5) << values[i * width + j];
+			string << std::setw(outputWide) << std::fixed << std::setprecision(3) << values[i * width + j];
 		}
 		string << std::setw(0) << std::endl;
 	}
@@ -95,9 +90,8 @@ void Matrix::set_output_wide(const size_t& outputWide)
 
 Matrix::Matrix(const Matrix& matrix)
 {
-	delete_counter = matrix.delete_counter;
-	delete_counter++;
-	values = matrix.values;
+	values = new double[matrix.width * matrix.height];
+	memcpy_s(values, matrix.width * matrix.height * sizeof(double), matrix.values, matrix.width * matrix.height * sizeof(double));
 	width = matrix.width;
 	height = matrix.height;
 	submatrix_index = matrix.submatrix_index;
