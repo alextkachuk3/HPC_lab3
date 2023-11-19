@@ -12,7 +12,7 @@ public:
 	Matrix(const size_t& width, const size_t& height);
 	~Matrix();
 
-	Vector solve_linear_equation_system();
+	Vector solve_linear_equation_system() const;
 	void gaussian_elimination();
 	void back_substitution();
 
@@ -38,7 +38,6 @@ public:
 private:
 	size_t height;
 	size_t width;
-	size_t submatrix_index;
 	double* values;
 
 	size_t outputWide;

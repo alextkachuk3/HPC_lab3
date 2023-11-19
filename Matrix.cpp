@@ -3,7 +3,6 @@
 Matrix::Matrix(const size_t& size)
 {
 	outputWide = defaultOutputWide;
-	submatrix_index = 0;
 
 	this->width = size;
 	this->height = size;
@@ -14,7 +13,6 @@ Matrix::Matrix(const size_t& size)
 Matrix::Matrix(const size_t& width, const size_t& height)
 {
 	outputWide = defaultOutputWide;
-	submatrix_index = 0;
 
 	this->width = width;
 	this->height = height;
@@ -27,7 +25,7 @@ Matrix::~Matrix()
 	delete[] values;
 }
 
-Vector Matrix::solve_linear_equation_system()
+Vector Matrix::solve_linear_equation_system() const
 {
 	Vector result(height);
 

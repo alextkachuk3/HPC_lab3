@@ -8,8 +8,8 @@ public:
 	HPC(int argc, char* argv[]);
 	~HPC();
 
-	int get_process_rank();
-	int get_process_num();
+	int get_process_rank() const;
+	int get_process_num() const;
 
 	Vector solve_linear_equation_system(Matrix& matrix);
 	void solve_linear_equation_system();
@@ -36,7 +36,10 @@ private:
 	void calculate_distribution();
 	void distribute_matrix(double* matrix = nullptr);
 
-	void result_colection();
+	void parallel_gaussian_elimination();
+	void parallel_back_substitution();
+
+	void result_collection();
 
 	void log(std::string message);
 };
