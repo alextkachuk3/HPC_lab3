@@ -10,6 +10,7 @@ public:
 	Matrix() = default;
 	Matrix(const size_t& size);
 	Matrix(const size_t& width, const size_t& height);
+	Matrix(const double* values, const size_t& width, const size_t& height);
 	~Matrix();
 
 	Vector solve_linear_equation_system() const;

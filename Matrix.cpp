@@ -20,6 +20,14 @@ Matrix::Matrix(const size_t& width, const size_t& height)
 	values = new double[width * height] {0};
 }
 
+Matrix::Matrix(const double* values, const size_t& width, const size_t& height)
+{
+	this->values = new double[width * height];
+	this->width = width;
+	this->height = height;
+	memcpy_s(this->values, this->width * this->height * sizeof(double), values, width * height * sizeof(double));
+}
+
 Matrix::~Matrix()
 {
 	delete[] values;

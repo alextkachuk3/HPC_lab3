@@ -27,7 +27,7 @@ void test_matrix_multiplication(const size_t& size, HPC& hpc)
 	finish = MPI_Wtime();
 	duration = finish - start;
 
-	if (true)
+	if (print_values)
 	{
 		std::cout << "Result:" << std::endl << result << std::endl;
 	}
