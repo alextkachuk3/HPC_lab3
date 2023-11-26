@@ -8,7 +8,7 @@
 bool print_values = false;
 bool evaluation_test = false;
 
-void test_matrix_vector_multiplication(const size_t& size)
+void test_equation_system_solving(const size_t& size)
 {
 	Matrix matrix(size + 1, size);
 	matrix.random_data_initialization();
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
 		for (size_t i = 0; i < sizeof(evaluation_sizes) / sizeof(size_t); i++)
 		{
-			test_matrix_vector_multiplication(evaluation_sizes[i]);
+			test_equation_system_solving(evaluation_sizes[i]);
 		}
 		return 0;
 	}
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
 	std::cin >> size;
 
-	test_matrix_vector_multiplication(size);
+	test_equation_system_solving(size);
 
 	return 0;
 
