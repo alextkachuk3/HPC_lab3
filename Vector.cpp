@@ -71,6 +71,8 @@ std::ostream& operator<<(std::ostream& out, const Vector& vector)
 
 bool Vector::operator==(const Vector& other)
 {
+	const static double accuracy = 1.e-6;
+
 	if (this->size != other.size)
 	{
 		return false;
@@ -78,7 +80,7 @@ bool Vector::operator==(const Vector& other)
 
 	for (size_t i = 0; i < this->size; i++)
 	{
-		if (this->values[i] != other.values[i])
+		if (fabs(other.values[i] - values[i] >= accuracy))
 		{
 			return false;
 		}

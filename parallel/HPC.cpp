@@ -60,10 +60,6 @@ Vector HPC::solve_linear_equation_system(Matrix& matrix)
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, matrix.get_values(), distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-	std::cout << "Matrix" << std::endl << matrix;
-
 	process_result = new double[distribution_rows[process_rank]];
 
 	result_collection();
@@ -91,12 +87,11 @@ void HPC::solve_linear_equation_system()
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, nullptr, distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
 	process_result = new double[distribution_rows[process_rank]];
 
 	result_collection();
 
+	delete[] process_result;
 	delete[] process_rows;
 }
 
@@ -107,7 +102,7 @@ void HPC::log(std::string message)
 
 void HPC::distribute_matrix(double* matrix)
 {
-	MPI_Scatterv(matrix, distribution_count, distribution_index, MPI_DOUBLE, process_rows, distribution_count[process_rank] * width, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Scatterv(matrix, distribution_count, distribution_index, MPI_DOUBLE, process_rows, distribution_count[process_rank], MPI_DOUBLE, 0, MPI_COMM_WORLD);
 }
 
 void HPC::parallel_gaussian_elimination()

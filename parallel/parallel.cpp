@@ -1,7 +1,7 @@
 #include <iostream>
 #include "HPC.h"
 
-bool print_values = true;
+bool print_values = false;
 bool evaluation_test = false;
 
 void test_matrix_multiplication(const size_t& size, HPC& hpc)
@@ -10,7 +10,7 @@ void test_matrix_multiplication(const size_t& size, HPC& hpc)
 
 	matrix.random_data_initialization();
 
-	if (true)
+	if (print_values)
 	{
 		size_t outputWide = 10;
 		matrix.set_output_wide(outputWide);
@@ -32,23 +32,21 @@ void test_matrix_multiplication(const size_t& size, HPC& hpc)
 		std::cout << "Result:" << std::endl << result << std::endl;
 	}
 
-	// std::cout << "Matrix size: " << size << std::endl;
-	// std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl << std::endl;
+	std::cout << "Matrix size: " << size << std::endl;
+	std::cout << "Time of execution: " << std::fixed << std::setprecision(12) << duration << std::endl << std::endl;
 
-	//if (result == matrix.solve_linear_equation_system())
-	//{
-	//	std::cout << "The results of serial and parallel algorithms are identical!" << std::endl;
-	//}
-	//else
-	//{
-	//	std::cout << "The results of serial and parallel algorithms are NOT identical!" << std::endl;
-	//}
+	if (result == matrix.solve_linear_equation_system())
+	{
+		std::cout << "The results of serial and parallel algorithms are identical!" << std::endl;
+	}
+	else
+	{
+		std::cout << "The results of serial and parallel algorithms are NOT identical!" << std::endl;
+	}
 }
 
 int main(int argc, char* argv[])
 {
-	//srand(clock());
-
 	for (size_t i = 0; i < argc; i++)
 	{
 		if (strcmp(argv[i], "-p") == 0)
