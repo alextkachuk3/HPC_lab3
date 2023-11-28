@@ -1,7 +1,7 @@
 #include <iostream>
 #include "HPC.h"
 
-bool print_values = false;
+bool print_values = true;
 bool evaluation_test = false;
 
 void test_matrix_multiplication(const size_t& size, HPC& hpc)

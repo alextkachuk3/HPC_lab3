@@ -17,8 +17,6 @@ HPC::HPC(int argc, char* argv[])
 	distribution_rows_index = new int[process_num];
 	distribution_count = new int[process_num];
 	distribution_index = new int[process_num];
-
-	result = nullptr;
 }
 
 HPC::~HPC()
@@ -52,7 +50,7 @@ Vector HPC::solve_linear_equation_system(Matrix& matrix)
 
 	process_rows = new double[distribution_count[process_rank]];
 
-	result = new double[distribution_count[process_rank] / width] {};
+	result = new double[height] {};
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
@@ -66,14 +64,11 @@ Vector HPC::solve_linear_equation_system(Matrix& matrix)
 
 	std::cout << "Matrix" << std::endl << matrix;
 
-	//result_collection();
+	process_result = new double[distribution_rows[process_rank]];
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	result_collection();
 
-	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, matrix.get_values(), distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-	std::cout << "Matrix" << std::endl << matrix;
-
+	delete[] process_result;
 	delete[] process_rows;
 
 	return Vector(result, (size_t)height);
@@ -98,13 +93,9 @@ void HPC::solve_linear_equation_system()
 
 	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, nullptr, distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-	MPI_Barrier(MPI_COMM_WORLD);
+	process_result = new double[distribution_rows[process_rank]];
 
-	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, nullptr, distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-
-
-	//result_collection();
+	result_collection();
 
 	delete[] process_rows;
 }
@@ -164,13 +155,6 @@ void HPC::parallel_gaussian_elimination()
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
-	/*std::string res;
-	for (int q = 0; q < width * distribution_rows[process_rank]; q++)
-	{
-		res += (std::to_string(process_rows[q]) + " ");
-	}
-	log(res);*/
-
 	delete[] row;
 }
 
@@ -196,5 +180,10 @@ void HPC::calculate_distribution()
 
 void HPC::result_collection()
 {
+	for (int i = 0; i < distribution_rows[process_rank]; i++)
+	{
+		process_result[i] = process_rows[width * (i + 1) - 1] / process_rows[distribution_rows_index[process_rank] + (i * (width + 1))];
+	}
+
 	MPI_Gatherv(process_result, distribution_rows[process_rank], MPI_DOUBLE, result, distribution_rows, distribution_rows_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 }
