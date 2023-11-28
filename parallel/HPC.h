@@ -29,16 +29,16 @@ private:
 	int* distribution_index;
 
 	double* process_rows;
-	double* process_result;
 
+	double* process_result;
 	double* result;
 
 	void calculate_distribution();
 	void distribute_matrix(double* matrix = nullptr);
 
 	void parallel_gaussian_elimination();
-	void parallel_back_substitution();
 
+	void gather_matrix();
 	void result_collection();
 
 	void log(std::string message);

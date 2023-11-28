@@ -18,7 +18,6 @@ HPC::HPC(int argc, char* argv[])
 	distribution_count = new int[process_num];
 	distribution_index = new int[process_num];
 
-	process_result = nullptr;
 	result = nullptr;
 }
 
@@ -52,19 +51,30 @@ Vector HPC::solve_linear_equation_system(Matrix& matrix)
 	calculate_distribution();
 
 	process_rows = new double[distribution_count[process_rank]];
-	process_result = new double[distribution_count[process_rank] / width] {};
 
 	result = new double[distribution_count[process_rank] / width] {};
+
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	distribute_matrix(matrix.get_values());
 
 	parallel_gaussian_elimination();
-	parallel_back_substitution();
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, matrix.get_values(), distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+	std::cout << "Matrix" << std::endl << matrix;
 
 	//result_collection();
 
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, matrix.get_values(), distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+	std::cout << "Matrix" << std::endl << matrix;
+
 	delete[] process_rows;
-	delete[] process_result;
 
 	return Vector(result, (size_t)height);
 }
@@ -76,13 +86,23 @@ void HPC::solve_linear_equation_system()
 
 	calculate_distribution();
 
-	process_rows = new double[distribution_count[process_rank]];
-	process_result = new double[distribution_count[process_rank] / width] {};
+	process_rows = new double[distribution_count[process_rank]] {};
+
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	distribute_matrix();
 
 	parallel_gaussian_elimination();
-	parallel_back_substitution();
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, nullptr, distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	MPI_Gatherv(process_rows, distribution_count[process_rank], MPI_DOUBLE, nullptr, distribution_count, distribution_index, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+
 
 	//result_collection();
 
@@ -104,6 +124,7 @@ void HPC::parallel_gaussian_elimination()
 	int cur_process = 0;
 	double mult = 0.0;
 	double* row = new double[width] {};
+	double* temp{};
 	for (int i = 0; i < height; i++)
 	{
 		cur_process = i / distribution_rows_size;
@@ -115,65 +136,42 @@ void HPC::parallel_gaussian_elimination()
 		if (cur_process == process_rank)
 		{
 			MPI_Bcast(process_rows + ((i - distribution_rows_index[process_rank]) * width), width, MPI_DOUBLE, cur_process, MPI_COMM_WORLD);
-
-			for (int j = (i - distribution_rows_index[process_rank] + 1); j < distribution_rows[process_rank]; j++)
-			{
-				mult = process_rows[j * width + i] / process_rows[(i - distribution_rows_index[process_rank]) * width + i];
-				for (int k = i; k < width; k++)
-				{
-					process_rows[j * width + k] -= (process_rows[(i - distribution_rows_index[process_rank]) * width + k] * mult);
-				}
-			}
-
-			/*std::string res;
-			for (int q = 0; q < width * distribution_rows[process_rank]; q++)
-			{
-				res += (std::to_string(process_rows[q]) + " ");
-			}
-			log(res);*/
+			temp = row;
+			row = process_rows + ((i - distribution_rows_index[process_rank]) * width);
 		}
 		else
 		{
 			MPI_Bcast(row, width, MPI_DOUBLE, cur_process, MPI_COMM_WORLD);
+		}
 
-			/*std::string row_res;
-			for (int q = 0; q < width; q++)
+		for (int j = 0; j < distribution_rows[process_rank]; j++)
+		{
+			if (distribution_rows_index[process_rank] + j != i)
 			{
-				row_res += (std::to_string(row[q]) + " ");
-			}
-			log(row_res);*/
-
-			for (int j = 0; j < distribution_rows[process_rank]; j++)
-			{
-				/*log("j " + std::to_string(j));
-				log("i: " + std::to_string(i) + "row[i]: " + std::to_string(row[i]) + "process_rows[]: " + std::to_string(process_rows[j + i]));*/
 				mult = process_rows[j * width + i] / row[i];
-				/*log("mult" + std::to_string(mult));*/
 				for (int k = i; k < width; k++)
 				{
-					process_rows[j * width + k] -= (row[k] * mult);
+					process_rows[j * width + k] -= row[k] * mult;
 				}
 			}
-			/*std::string res;
-			for (int q = 0; q < width; q++)
-			{
-				res += (std::to_string(row[q]) + " ");
-			}
-			log(res);*/
 		}
+
+		if (cur_process == process_rank)
+		{
+			row = temp;
+		}
+
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
-	std::string res;
+
+	/*std::string res;
 	for (int q = 0; q < width * distribution_rows[process_rank]; q++)
 	{
 		res += (std::to_string(process_rows[q]) + " ");
 	}
-	log(res);
-}
+	log(res);*/
 
-void HPC::parallel_back_substitution()
-{
-
+	delete[] row;
 }
 
 void HPC::calculate_distribution()
